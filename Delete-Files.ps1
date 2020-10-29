@@ -20,12 +20,19 @@ Write-Verbose "Found $FileCount files that are older than $Date on $Server" -Ver
 
 
 
-if ($Delete -eq "Yes") {
+if ($Delete -eq "Yes" -and $FileCount -ge 1) {
 
 Write-Verbose "Delete Feature is toggled on. Deleting $FileCount files which are listed above on $Server..." -Verbose
 
 
 $DeleteFiles = Invoke-Command -ComputerName $Server -ScriptBlock {$using:GetFiles | Remove-Item}
+
+
+}
+
+elseif ($Delete -eq "Yes" -and $FileCount -eq 0) {
+
+Write-Verbose "Delete Feature is toggled on. But $FileCount files found on $Server... Deleting Skipped" -Verbose
 
 
 }
@@ -40,4 +47,3 @@ Write-Verbose "Delete Feature is toggled off. No files have been deleted" -Verbo
 }
 
 }
-
