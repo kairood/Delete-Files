@@ -1,3 +1,8 @@
+#Requires
+# V2 PowerShell
+# WINRM Enabled On Remote Servers
+
+
 Function Delete-Files {
 
 
@@ -5,11 +10,11 @@ param([Parameter(Mandatory=$true)][String[]] $Servers, [Parameter(Mandatory=$tru
 
 
 
-$Date = (Get-Date).AddDays(-$Days)
+$Date = (Get-Date).AddDays(-$Days) 
 
 foreach ($Server in $Servers) {
 
-$GetFiles = Invoke-Command -ComputerName $Server -ScriptBlock {Get-ChildItem -Path $using:FolderPath | Where LastWriteTime -LT $using:Date}
+$GetFiles = Invoke-Command -ComputerName $Server -ScriptBlock {Get-ChildItem -Path $using:FolderPath | Where-Object {$_.LastWriteTime -LT $using:Date}}
 
 $GetFiles 
 
@@ -25,8 +30,11 @@ if ($Delete -eq "Yes" -and $FileCount -ge 1) {
 Write-Verbose "Delete Feature is toggled on. Deleting $FileCount files which are listed above on $Server..." -Verbose
 
 
-$DeleteFiles = Invoke-Command -ComputerName $Server -ScriptBlock {$using:GetFiles | Remove-Item}
+foreach ($File in $GetFiles ) {
 
+$DeleteFiles = Invoke-Command -ComputerName $Server -ScriptBlock {$using:File | Remove-Item}
+
+}
 
 }
 
@@ -47,3 +55,4 @@ Write-Verbose "Delete Feature is toggled off. No files have been deleted" -Verbo
 }
 
 }
+
